@@ -67,9 +67,8 @@ void ThreadPool::impl::start() {
         std::cout << "线程池已经启动" << std::endl;
         return;
     }
-    m_stop.store(false); // 设置启动标志
-    m_idleThreads = m_curThreads =
-        m_minThreads; // 初始化当前和空闲线程数为最小值
+    m_stop.store(false);
+    m_idleThreads = m_curThreads = m_minThreads;
     std::cout << "启动线程池，线程数量: " << m_curThreads << std::endl;
 
     // 启动管理线程
@@ -122,8 +121,8 @@ void ThreadPool::impl::manager() {
         std::this_thread::sleep_for(std::chrono::seconds(3));
         if (m_idleThreads > m_curThreads / 2 &&
             m_curThreads > m_minThreads + 2) {
-            m_exitNumber.store(2);      // 设置退出数量
-            m_cvSleepCtrl.notify_all(); // 通知所有线程
+            m_exitNumber.store(2); // 设置退出数量
+            m_cvSleepCtrl.notify_all();
             std::lock_guard<std::mutex> lck(m_idsMutex);
             for (const auto &id : m_ids) {
                 auto it = m_workers.find(id);
